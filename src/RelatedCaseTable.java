@@ -23,5 +23,16 @@ public class RelatedCaseTable {
 			}
 		}
 	}
+	
+	public String getRelatedCasesString(){
+		String listString = "";
+
+		for (String s : relatedCases)
+		{
+		    listString += s + "; ";
+		}
+		return listString; 
+
+	}
 
 }

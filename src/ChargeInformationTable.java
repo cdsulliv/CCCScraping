@@ -24,6 +24,40 @@ public class ChargeInformationTable {
 		return dates;
 	}
 	
+	public String getChargesString(){
+		String listString = ""; 
+		for (String s : charges)
+		{
+		    listString += s + "; ";
+		}
+		return listString; 	
+	}
+	public String getStatutesString(){
+		String listString = ""; 
+		for (String s : statutes)
+		{
+		    listString += s + "; ";
+		}
+		return listString; 	
+	}
+	public String getLevelsString(){
+		String listString = ""; 
+		for (String s : levels)
+		{
+		    listString += s + "; ";
+		}
+		return listString; 	
+	}
+	public String getDatesString(){
+		String listString = ""; 
+		for (String s : dates)
+		{
+		    listString += s + "; ";
+		}
+		return listString; 	
+
+	}
+	
 	public ChargeInformationTable(Element aTable){
 		// Check that the table is the right one
 		String caption= aTable.select("caption").text();
