@@ -29,15 +29,16 @@ public class EventsTable {
 		List<String> tableHeaders = Arrays.asList("date", "blank1", "blank2", "eventdetails");
 		
 		// eventInfo will hold the information from each line of charge data
-		TreeMap<String, String> eventInfo = null;
+		TreeMap<String, String> eventInfo 		= null;
+		TreeMap<String, String> eventDetails 	= null; 
 		String charge 	= ""; 
 		String dispo 	= "";
 		
 		// Loop through the rows of the table and create a new event for each line
 		Elements rows = aTable.select("tr");
 		for(Element row : rows){
-			eventInfo = new TreeMap<String, String>();
-			eventDetails= new TreeMap<String, String>();
+			eventInfo 		= new TreeMap<String, String>();
+			eventDetails	= new TreeMap<String, String>();
 
 			
 			Elements cells = row.children();
@@ -52,6 +53,7 @@ public class EventsTable {
 				
 				for (String ecol : eventHeaders){
 					eventDetails.put(ecol, divs.get(tableHeaders.indexOf(ecol)).ownText());
+					System.out.println("Adding " + ecol + ": " + divs.get(tableHeaders.indexOf(ecol)).ownText()); 
 				}
 //				int i = 0; 
 //				for(Element div : divs){
@@ -62,7 +64,7 @@ public class EventsTable {
 				
 				
 			}
-			dispositions.put(eventInfo.get("charge"), eventInfo.get("dispo"));
+			dispositions.put(eventDetails.get("charge"), eventInfo.get("dispo"));
 			// Add charge information to the appropriate TreeMaps 
 //			dispositions.put(chargeInfo.get("chargename"));
 		}

@@ -40,7 +40,7 @@ public class Scraper {
     	       System.out.println(chargeTable.getCharges());
     	       System.out.println(chargeTable.getStatutes());
     	   } else if (tableType.equals("Events & Orders of the Court")){
- //   	       EventsTable eventTable = new EventsTable(t);
+    	       EventsTable eventTable = new EventsTable(t);
     	       System.out.println("Events table created.");
     	   } else if (tableType.equals("Financial Information")){
 //    	       FinancialInformationTable financialTable = new FinancialInformationTable(t);
