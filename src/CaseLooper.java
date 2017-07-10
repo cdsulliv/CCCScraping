@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import org.jsoup.Jsoup;
 import java.util.*;
 
@@ -13,8 +12,23 @@ public class CaseLooper {
     private static final String FILE_HEADER = "caseid,filename,defendantname,defenseattorney,prosecutor,relatedcases,"
     		+ "numcharges,charges,levels,disposition,incarcerated,suspended,sentence,"
     		+ "minimum,maximum";
+	private static String[] caseNumbers;
 
 	public static void main(String[] args) throws Exception {
+		// caseNumbers - array of Strings to store first 100 case numbers 
+		caseNumbers = new String[100];
+		CaseInput testInput = new CaseInput();
+		testInput.open();
+		testInput.read();
+		testInput.initializeArray(caseNumbers);
+		testInput.close();
+		
+		// caseList - array of strings to store name of first 100 text files
+		String[] caseList = new String[100];
+		for (int i = 0; i < 100; i++) {
+			caseList[i] = caseNumbers[i] + ".txt";
+//			System.out.println(i+ ". " + caseList[i]);
+		}
 		
 	    // TreeMap will hold the filename and a Case object
 		TreeMap<String,Case> Cases = new TreeMap<String,Case>();
@@ -22,8 +36,8 @@ public class CaseLooper {
 		final String dir = System.getProperty("user.dir");
 	    System.out.println("current dir = " + dir);
 		   
-	    String[] caseList = {"testpage.html", "testpage2.html", "testpage3.html", "testpage4.html", "testpage5.html", 
-	    		"testpage6.html", "testpage7.html", "testpage8.html", "testpage9.html", "testpage10.html"};
+//	    String[] caseList = {"testpage.html", "testpage2.html", "testpage3.html", "testpage4.html", "testpage5.html", 
+//	    		"testpage6.html", "testpage7.html", "testpage8.html", "testpage9.html", "testpage10.html"};
 	   
 	    for(String s : caseList){
 	    	Cases.put(s, new Case(Jsoup.parse(new File(s), "utf-8"))); 
