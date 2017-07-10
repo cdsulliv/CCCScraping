@@ -58,6 +58,13 @@ public class ChargeInformationTable {
 
 	}
 	
+	public ChargeInformationTable(){
+		ArrayList<String> charges 	= new ArrayList<String>(Arrays.asList("NULL"));
+		ArrayList<String> statutes 	= new ArrayList<String>(Arrays.asList("NULL")); 
+		ArrayList<String> levels 	= new ArrayList<String>(Arrays.asList("NULL"));
+		ArrayList<String> dates		= new ArrayList<String>(Arrays.asList("NULL"));
+	}
+	
 	public ChargeInformationTable(Element aTable){
 		// Check that the table is the right one
 		String caption= aTable.select("caption").text();

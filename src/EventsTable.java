@@ -1,19 +1,22 @@
 import java.util.*;
 import java.io.*;
+
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 	
 public class EventsTable {
 	
 	// TreeMaps indexed by charge
 	TreeMap<String, String> dispositions 	= new TreeMap<String, String>();
-	TreeMap<String, String> sentences	 	= new TreeMap<String, String>();
+	TreeMap<String, Sentence> sentences	 	= new TreeMap<String, Sentence>();
 	ArrayList<String> events 				= new ArrayList<String>(Arrays.asList(""));
 	
 	public TreeMap<String, String> getDispositions(){
 		return dispositions;
 	}
-	public TreeMap<String, String> getSentences(){
+	public TreeMap<String, Sentence> getSentences(){
 		return sentences;
 	}
 	public ArrayList<String> getEvents(){
@@ -25,22 +28,26 @@ public class EventsTable {
 		for (String k : dispositions.keySet()) {
 			mapString += k + ": " + dispositions.get(k) + "; ";
 		}
-		return mapString;
+		return mapString.replaceAll("[,]", ";");
 	}
+	
+	// Get all the text from the sentence element
 	public String getSentencesString(){
 		String mapString = ""; 
 		for (String k : sentences.keySet()) {
-			mapString += k + ": " + sentences.get(k) + "; ";
+			mapString += k + ": " + sentences.get(k).getSentenceAllText() + "; ";
 		}
-		return mapString;
+		return mapString.replaceAll("[,]", ";");
 	}
+	
+	// Get the string of hearings information
 	public String getEventsString(){
 		String listString = ""; 
 		for (String s : events)
 		{
 		    listString += s + "; ";
 		}
-		return listString; 		
+		return listString.replaceAll("[,]", ";"); 		
 	}
 	
 	
@@ -51,7 +58,8 @@ public class EventsTable {
 		}
 		
 		Elements divs = atd.select("div > div");
-		if(divs.size()==4){ 
+		
+		if(divs.size()==4 | divs.text().contains("Guilty") | divs.text().contains("Charges Amended") | divs.text().contains("Dismissed")){ 
 			eventType = "dispo"; 
 		} else if(divs.size()==3){ 
 			eventType = "sentence"; 
@@ -59,18 +67,16 @@ public class EventsTable {
 			eventType = "hearings"; 
 		}
 		
-
+		
+		
 		return eventType; 
 	}
 	
-	
-	public static void parseEventDetails(Element atd){
-
-		
-		
+	public EventsTable(){
+		dispositions.put("NULL", "NULL");
+		sentences.put("NULL", new Sentence());
 	}
-			
-	
+		
 	public EventsTable(Element aTable){
 		// Check that the table is the right one
 		String caption= aTable.select("caption").text();
@@ -105,56 +111,43 @@ public class EventsTable {
 				String eventType = getEventType(eventInfoHTML);
 				
 				if(eventType.equals("dispo")){
-					dispositions.put(eventInfoHTML.select("div > div > div").first().ownText(), 
-									eventInfoHTML.select("div > div > div > div").first().ownText());
+					
+					// Select the divs with the disposition information
+					Elements dispoDivs = eventInfoHTML.select("div > div > div");
+					String chargeName = dispoDivs.first().ownText();
+					int ndispos= dispoDivs.size()/2;
+				
+					// Split the html at each div to separate different charges within a div
+					String text = dispoDivs.first().html();
+					String[] textSplitResult = text.split("<div.*>");	
+					
+//					Element[] elArray = new Element[textSplitResult.length];
+//					String[] StrArray = new String[textSplitResult.length];
+					
+					for(int whichdispo = 0; whichdispo<ndispos; whichdispo++){	
+						dispositions.put(Jsoup.parse(textSplitResult[whichdispo*2]).text(),
+								Jsoup.parse(textSplitResult[whichdispo*2+1]).text());				
+					}
+
 				} else if(eventType=="sentence"){
-					sentences.put(eventInfoHTML.select("div > div > div").first().ownText(),
-								eventInfoHTML.select("div > div > div > div").first().text());
+				
+					Sentence sentence = new Sentence(eventInfoHTML); 
+					sentences.put(sentence.getCharge(), sentence); 
+					
+					// Make note if there is more than one sentence
+					if(sentences.size() > 1){
+						System.out.println("There are multiple sentences");
+					}
+					
 				} else if(eventType=="hearings") {
 					events.add(eventInfoHTML.text());
 					
 				}
-			//charge = cells.get(tableHeaders.indexOf("eventdetails")).select("div");
-				
-				
-//				Elements divs = cells.get(tableHeaders.indexOf("eventdetails")).select("div>div");
-
-				
-//				List<String> eventHeaders = Arrays.asList("blank", "charge", "dispo");
-				
-//				System.out.println(divs.size());
-//				if(divs.size()>=eventHeaders.size()){
-//					
-//					for (String ecol : eventHeaders){
-//						eventDetails.put(ecol, divs.get(eventHeaders.indexOf(ecol)).ownText());
-//						System.out.println("Adding " + ecol + ": " + divs.get(eventHeaders.indexOf(ecol)).ownText()); 
-//					}
-//					System.out.println(eventDetails.get("charge"));
-//					System.out.println(eventDetails.get("dispo"));
-//					dispositions.put(eventDetails.get("charge"), eventDetails.get("dispo"));
 
 			}
-			
-			
-//				int i = 0; 
-//				for(Element div : divs){
-//					charge = div.ownText();
-//					System.out.println(i++);
-//					System.out.println(div.ownText());	
-//				}
 				
 				
 		}
-		
-//		for(String k: eventInfo.keySet()){
-//			eventInfo
-//		}
-			// Add charge information to the appropriate TreeMaps 
-//			dispositions.put(chargeInfo.get("chargename"));
-//		}
-//		for(String k : dispositions.keySet()){
-//			System.out.println(k + ": " + dispositions.get(k));
-//		}
 	}
 	
 }

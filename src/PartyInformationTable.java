@@ -1,28 +1,36 @@
-	import java.util.*;
-	import org.jsoup.nodes.Element;
-	import org.jsoup.select.Elements;
+import java.util.*;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class PartyInformationTable {
 
 		String defendant 	= ""; 
-		String plaintiff 	= ""; 
 		String defenseatt 	= "";
+		String plaintiff 	= ""; 
 		String prosecatt	= "";
 
 		
 		public String getDefendantName(){
-			return defendant;
+			return defendant.replaceAll("[,]", ";");
 		}
 		public String getPlaintiffName(){
-			return plaintiff;
+			return plaintiff.replaceAll("[,]", ";");
 		}
 		public String getDefenseAttorney(){
-			return defenseatt;
+			return defenseatt.replaceAll("[,]", ";");
 		}
 		public String getProsecutingAttorney(){
-			return prosecatt;
+			return prosecatt.replaceAll("[,]", ";");
 		}
 
+		
+		public PartyInformationTable(){
+			defendant	= "NULL";
+			defenseatt	= "NULL";
+			plaintiff	= "NULL";
+			prosecatt	= "NULL";
+			
+		}
 		
 		public PartyInformationTable(Element aTable){
 			// Check that the table is the right one
@@ -32,7 +40,17 @@ public class PartyInformationTable {
 			Elements rows = aTable.select("tr");
 			
 			for(Element tr : rows){
-				System.out.println(tr.text());
+
+				for (int i = 0; i < tr.childNodeSize(); i++) {
+					if (tr.child(i).text().equals("Defendant")) {
+						defendant = tr.child(i+1).text();
+						defenseatt = tr.child(tr.childNodeSize() - 1).text();
+					}
+					else if (tr.child(i).text().equals("Plaintiff")) {
+						plaintiff = tr.child(i+1).text();
+						prosecatt = tr.child(tr.childNodeSize() - 1).text();
+					}
+				}
 			}
 		}
 

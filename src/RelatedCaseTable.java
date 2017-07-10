@@ -10,6 +10,10 @@ public class RelatedCaseTable {
 		return relatedCases;
 	}
 	
+	public RelatedCaseTable(){
+		relatedCases = new ArrayList<String>(Arrays.asList("NULL")); 
+	}
+	
 	public RelatedCaseTable(Element aTable){
 		// Check that the table is the right one
 		String caption= aTable.select("caption").text();
