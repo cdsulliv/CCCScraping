@@ -59,6 +59,15 @@ public class Case {
 		return susp;
 	}
 	
+	public String getSuspendedText(){
+		String susp = ""; 
+		for(String k : getEventsTable().getSentences().keySet()){
+			susp = susp + getEventsTable().getSentences().get(k).getSuspendedText();
+		}
+		
+		return susp;
+	}
+	
 	public String getMaxSentenceText(){
 		String s = ""; 
 		for(String k : getEventsTable().getSentences().keySet()){
@@ -75,6 +84,15 @@ public class Case {
 		}
 		
 		return s;
+	}
+	public String getSentencedToText(){
+		String s = ""; 
+		for(String k : getEventsTable().getSentences().keySet()){
+			s = s + getEventsTable().getSentences().get(k).getSentencedToText(); 
+		}
+		
+		return s;
+		
 	}
     
     // Get information directly from Party Information Table

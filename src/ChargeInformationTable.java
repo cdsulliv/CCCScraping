@@ -30,7 +30,7 @@ public class ChargeInformationTable {
 		{
 		    listString += s + "; ";
 		}
-		return listString; 	
+		return listString.replaceAll("[,]", "-"); 	
 	}
 	public String getStatutesString(){
 		String listString = ""; 
@@ -46,7 +46,7 @@ public class ChargeInformationTable {
 		{
 		    listString += s + "; ";
 		}
-		return listString; 	
+		return listString.replaceAll("[,]", "-"); 	
 	}
 	public String getDatesString(){
 		String listString = ""; 
@@ -54,7 +54,7 @@ public class ChargeInformationTable {
 		{
 		    listString += s + "; ";
 		}
-		return listString; 	
+		return listString.replaceAll("[,]", "-"); 	
 
 	}
 	

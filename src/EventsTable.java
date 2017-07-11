@@ -62,6 +62,7 @@ public class EventsTable {
 		if(divs.size()==4 | divs.text().contains("Guilty") | divs.text().contains("Charges Amended") | divs.text().contains("Dismissed")){ 
 			eventType = "dispo"; 
 		} else if(divs.size()==3){ 
+//			System.out.println("Sentence div: " + atd);
 			eventType = "sentence"; 
 		} else if(divs.size()==0 & eventType==""){ 
 			eventType = "hearings"; 
@@ -130,10 +131,11 @@ public class EventsTable {
 					}
 
 				} else if(eventType=="sentence"){
-				
+					//System.out.println("eventType is sentence - generating a new sentence");
 					Sentence sentence = new Sentence(eventInfoHTML); 
-					sentences.put(sentence.getCharge(), sentence); 
-					
+					if(!sentences.keySet().contains(sentence.getCharge())){
+						sentences.put(sentence.getCharge(), sentence); 
+					}
 					// Make note if there is more than one sentence
 					if(sentences.size() > 1){
 						System.out.println("There are multiple sentences");

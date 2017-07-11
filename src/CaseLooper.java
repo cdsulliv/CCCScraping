@@ -10,8 +10,8 @@ public class CaseLooper {
 	private static final String COMMA_DELIMITER = ",";
 	private static final String NEW_LINE_SEPARATOR = "\n";
     private static final String FILE_HEADER = "caseid,filename,defendantname,defenseattorney,prosecutor,relatedcases,"
-    		+ "numcharges,charges,levels,disposition,incarcerated,suspended,sentence,"
-    		+ "minimum,maximum";
+    		+ "numcharges,charges,levels,disposition,incarcerated,suspended,suspendedtext,sentence,"
+    		+ "minimum,maximum,sentencedtotext";
 	private static String[] caseNumbers;
 
 	public static void main(String[] args) throws Exception {
@@ -27,7 +27,7 @@ public class CaseLooper {
 		String[] caseList = new String[100];
 		for (int i = 0; i < 100; i++) {
 			caseList[i] = caseNumbers[i] + ".txt";
-//			System.out.println(i+ ". " + caseList[i]);
+			System.out.println(i+ ". " + caseList[i]);
 		}
 		
 	    // TreeMap will hold the filename and a Case object
@@ -36,8 +36,7 @@ public class CaseLooper {
 		final String dir = System.getProperty("user.dir");
 	    System.out.println("current dir = " + dir);
 		   
-//	    String[] caseList = {"testpage.html", "testpage2.html", "testpage3.html", "testpage4.html", "testpage5.html", 
-//	    		"testpage6.html", "testpage7.html", "testpage8.html", "testpage9.html", "testpage10.html"};
+//	    String[] caseList = {"C316831.txt"};
 	   
 	    for(String s : caseList){
 	    	Cases.put(s, new Case(Jsoup.parse(new File(s), "utf-8"))); 
@@ -107,7 +106,10 @@ public class CaseLooper {
 	    		// Sentences - suspended
 	    		fileWriter.append(Cases.get(k).isSuspended()+"");
 	    		fileWriter.append(COMMA_DELIMITER);
-	    		
+
+	    		// Sentences - suspended
+	    		fileWriter.append(Cases.get(k).getSuspendedText()+"");
+	    		fileWriter.append(COMMA_DELIMITER);	    		
 	    		// Sentences text
 	    		fileWriter.append(Cases.get(k).getSentencesString());
 	    		fileWriter.append(COMMA_DELIMITER);
@@ -118,6 +120,9 @@ public class CaseLooper {
 	    		
 	    		// Sentences Max
 	    		fileWriter.append(Cases.get(k).getMinSentenceText());
+	    		fileWriter.append(COMMA_DELIMITER);
+	    		// Sentenced-to Text
+	    		fileWriter.append(Cases.get(k).getSentencedToText());
 	    		
 	    		fileWriter.append(NEW_LINE_SEPARATOR);
 	    	}
