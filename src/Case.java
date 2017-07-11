@@ -94,6 +94,43 @@ public class Case {
 		return s;
 		
 	}
+	
+	public int getSentenceMin(){
+		int min = -1; 
+		for(String k : getEventsTable().getSentences().keySet()){
+			System.out.println("Getting case-level min: " + getEventsTable().getSentences().get(k).getMin());
+			min = getEventsTable().getSentences().get(k).getMin(); 
+		}
+		
+		return min;	
+	}
+	
+	public int getSentenceMax(){
+		int max = -1; 
+		for(String k : getEventsTable().getSentences().keySet()){
+			max = getEventsTable().getSentences().get(k).getMax(); 
+		}
+		
+		return max;	
+	}
+	
+	public String getSentenceMinUnit(){
+		String minUnit = ""; 
+		for(String k : getEventsTable().getSentences().keySet()){
+			minUnit = minUnit + getEventsTable().getSentences().get(k).getMinUnit(); 
+		}
+		
+		return minUnit;	
+	}
+	
+	public String getSentenceMaxUnit(){
+		String maxUnit = ""; 
+		for(String k : getEventsTable().getSentences().keySet()){
+			maxUnit = maxUnit + getEventsTable().getSentences().get(k).getMaxUnit(); 
+		}
+		
+		return maxUnit;	
+	}
     
     // Get information directly from Party Information Table
 	public String getDefendantName(){

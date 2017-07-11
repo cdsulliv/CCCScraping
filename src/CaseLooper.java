@@ -2,7 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.jsoup.Jsoup;
-import java.util.*;
+import java.util.TreeMap;
 
 
 public class CaseLooper {
@@ -11,7 +11,7 @@ public class CaseLooper {
 	private static final String NEW_LINE_SEPARATOR = "\n";
     private static final String FILE_HEADER = "caseid,filename,defendantname,defenseattorney,prosecutor,relatedcases,"
     		+ "numcharges,charges,levels,disposition,incarcerated,suspended,suspendedtext,sentence,"
-    		+ "minimum,maximum,sentencedtotext";
+    		+ "minimum,maximum,sentencedtotext,minNo, minUnit, maxNo, maxUnit";
 	private static String[] caseNumbers;
 
 	public static void main(String[] args) throws Exception {
@@ -123,6 +123,23 @@ public class CaseLooper {
 	    		fileWriter.append(COMMA_DELIMITER);
 	    		// Sentenced-to Text
 	    		fileWriter.append(Cases.get(k).getSentencedToText());
+	    		fileWriter.append(COMMA_DELIMITER);
+	    		
+	    		// Min sentence number
+	    		fileWriter.append(Cases.get(k).getSentenceMin()+"");
+	    		fileWriter.append(COMMA_DELIMITER);
+	    		
+	    		// Min sentence units
+	    		fileWriter.append(Cases.get(k).getSentenceMax()+"");
+	    		fileWriter.append(COMMA_DELIMITER);
+	    		
+	    		// Max sentence number
+	    		fileWriter.append(Cases.get(k).getSentenceMinUnit());
+	    		fileWriter.append(COMMA_DELIMITER);
+	    		
+	    		// Max sentence units 
+	    		fileWriter.append(Cases.get(k).getSentenceMaxUnit());
+	    		fileWriter.append(COMMA_DELIMITER);
 	    		
 	    		fileWriter.append(NEW_LINE_SEPARATOR);
 	    	}
