@@ -12,14 +12,15 @@ public class Sandbox {
     
 	public static void main(String[] args) throws Exception {			   
 		    
-		Case case2 = new Case(Jsoup.parse(new File("testpage3.html"), "utf-8")); 	    
+		// Note: changed the arguments of constructor so this statement won't work without the original caseNumber
+//		Case case2 = new Case(Jsoup.parse(new File("testpage3.html"), "utf-8")); 	    
        
-		System.out.println(case2.getEventsTable().getSentences()+ "\n");
-		System.out.println(case2.getEventsTable().getSentencesString());
-		
-		
-		System.out.println(case2.getEventsTable().getDispositions()+ "\n");
-		System.out.println(case2.getEventsTable().getDispositionsString());
+//		System.out.println(case2.getEventsTable().getSentences()+ "\n");
+//		System.out.println(case2.getEventsTable().getSentencesString());
+//		
+//		
+//		System.out.println(case2.getEventsTable().getDispositions()+ "\n");
+//		System.out.println(case2.getEventsTable().getDispositionsString());
 
     }
 

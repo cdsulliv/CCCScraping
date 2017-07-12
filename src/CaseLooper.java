@@ -2,32 +2,37 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.jsoup.Jsoup;
-import java.util.TreeMap;
+import org.jsoup.nodes.Document;
 
+import java.util.TreeMap;
 
 public class CaseLooper {
 	
 	private static final String COMMA_DELIMITER = ",";
 	private static final String NEW_LINE_SEPARATOR = "\n";
-    private static final String FILE_HEADER = "caseid,filename,defendantname,defenseattorney,prosecutor,relatedcases,"
+    private static final String FILE_HEADER = "original_caseid,scraped_caseid,casefound,defendantname,defenseattorney,prosecutor,relatedcases,"
     		+ "numcharges,charges,levels,disposition,incarcerated,suspended,suspendedtext,sentence,"
     		+ "minimum,maximum,sentencedtotext,minNo, minUnit, maxNo, maxUnit";
 	private static String[] caseNumbers;
+	private static String[] refinedCaseNumbers;
+	private static SeleniumCCC seleniumInstance;
 
 	public static void main(String[] args) throws Exception {
 		// caseNumbers - array of Strings to store first 100 case numbers 
 		caseNumbers = new String[100];
+		refinedCaseNumbers = new String[100];
 		CaseInput testInput = new CaseInput();
 		testInput.open();
 		testInput.read();
 		testInput.initializeArray(caseNumbers);
 		testInput.close();
 		
-		// caseList - array of strings to store name of first 100 text files
-		String[] caseList = new String[100];
-		for (int i = 0; i < 100; i++) {
-			caseList[i] = caseNumbers[i] + ".txt";
-			System.out.println(i+ ". " + caseList[i]);
+		// code to refine all the case numbers that have been read in to caseNumbers
+		CaseNumberRefiner refiner = new CaseNumberRefiner();
+		for (int i = 0; i < caseNumbers.length; i++) {
+//			System.out.println("Old: " + caseNumbers[i]);
+			refinedCaseNumbers[i] = refiner.Refiner(caseNumbers[i]);
+//			System.out.println("New: " + caseNumbers[i]);
 		}
 		
 	    // TreeMap will hold the filename and a Case object
@@ -35,11 +40,37 @@ public class CaseLooper {
 
 		final String dir = System.getProperty("user.dir");
 	    System.out.println("current dir = " + dir);
-		   
-//	    String[] caseList = {"C316831.txt"};
-	   
-	    for(String s : caseList){
-	    	Cases.put(s, new Case(Jsoup.parse(new File(s), "utf-8"))); 
+	    
+	    
+		seleniumInstance = new SeleniumCCC();
+		seleniumInstance.setUp();
+		String page = "";
+	    for(int i = 0; i < refinedCaseNumbers.length - 94; i++) {
+	    	// 1) Get searchable string - DONE
+	    	String currentCaseNumber = refinedCaseNumbers[i];
+	    	
+	    	// 2) Launch Selenium browser and navigate to page - DONE
+	    	if (i == 0) {
+				page = seleniumInstance.testFirstClark(currentCaseNumber, 0);
+	    	}
+	    	else {
+	    		page = seleniumInstance.testFirstClark(currentCaseNumber, 1);
+	    	}
+	    	
+	    	// 3) Get page source
+//	    	String page = driver.getSource();
+	    	
+	    	// 4) Create new case
+//	    	Cases.put(s, new Case(Jsoup.parse(new File(s), "utf-8")));
+	    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), caseNumbers[i]));
+	    	if(Cases.get(currentCaseNumber).getCharges() == null) {
+	    		System.out.println("CHARGES WERE INITIALLY NULL; RERUNNING");
+	    		page = seleniumInstance.testFirstClark(currentCaseNumber, 1);
+		    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), caseNumbers[i]));
+	    		
+	    	}
+	    	
+	    	// 5) Close driver
 	    }	    
 	    System.out.println("Number of Cases created: " + Cases.size());
 	    
@@ -59,12 +90,16 @@ public class CaseLooper {
 	    	for(String k: Cases.keySet()){
 	    		System.out.println(k);
 	    		
-	    		// Cross Reference Number
+	    		// Original case id
+	    		fileWriter.append(Cases.get(k).getOriginalCaseNumber()); 
+	    		fileWriter.append(COMMA_DELIMITER);
+	    		
+	    		// Scraped case id
 	    		fileWriter.append(Cases.get(k).getCrossRefNumber()); 
 	    		fileWriter.append(COMMA_DELIMITER);
 	    		
-	    		// File Name
-	    		fileWriter.append(k); 
+	    		// Case Found
+	    		fileWriter.append(Cases.get(k).getCaseFound() + ""); 
 	    		fileWriter.append(COMMA_DELIMITER);
 
 	    		// Defendant Name
@@ -84,7 +119,7 @@ public class CaseLooper {
 	    		fileWriter.append(COMMA_DELIMITER);
 	    		
 	    		// Number of charges
-	    		fileWriter.append(Cases.get(k).getCharges().size()+"");
+	    		fileWriter.append(Cases.get(k).getCharges().size() + "");
 	    		fileWriter.append(COMMA_DELIMITER);
 	    		
 	    		// List of charges
@@ -100,11 +135,11 @@ public class CaseLooper {
 	    		fileWriter.append(COMMA_DELIMITER);
 	    		
 	    		// Sentences - incarcerated
-	    		fileWriter.append(Cases.get(k).isIncarcerated()+"");
+	    		fileWriter.append(Cases.get(k).isIncarcerated() + "");
 	    		fileWriter.append(COMMA_DELIMITER);
 
 	    		// Sentences - suspended
-	    		fileWriter.append(Cases.get(k).isSuspended()+"");
+	    		fileWriter.append(Cases.get(k).isSuspended() + "");
 	    		fileWriter.append(COMMA_DELIMITER);
 
 	    		// Sentences - suspended
@@ -156,8 +191,7 @@ public class CaseLooper {
 	    		System.out.println("Error while flushing/closing fileWriter !!!");
 	    		e.printStackTrace();
 	    	}
-	    }
-	       
+	    }   
 	
 	}
 }

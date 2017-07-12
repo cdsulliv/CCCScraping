@@ -12,7 +12,7 @@ public class CaseInput {
 
 	public void open() {
 		try {
-			s = new Scanner(new File("DistCourtNumSample2.txt"));
+			s = new Scanner(new File("CourtDataSample_MissDispo.txt"));
 		}	
 		catch (Exception E) {
 			System.out.println("File not found!");

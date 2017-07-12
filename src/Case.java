@@ -6,11 +6,13 @@ import org.jsoup.nodes.Element;
 import java.util.*;
 
 public class Case {
-	String crossRefNumber 				="";
+	String crossRefNumber 				= "";
+	String originalCaseNumber           = "";
     RelatedCaseTable rct 				= new RelatedCaseTable(); 
     PartyInformationTable pit 			= new PartyInformationTable();
     ChargeInformationTable chargeTable 	= new ChargeInformationTable();
     EventsTable eventTable 				= new EventsTable(); 
+    int caseFound; 
     
     public String getCrossRefNumber(){
     	return crossRefNumber; 
@@ -28,6 +30,7 @@ public class Case {
     public EventsTable getEventsTable(){
     	return eventTable;
     }
+    
     
     // Get information directly from Events Information Table
 	public String getDispositionsString(){
@@ -172,39 +175,54 @@ public class Case {
 		return getChargeInformationTable().getDatesString(); 
 	}
 	
+	public int getCaseFound() {
+		return caseFound;
+	}
+	
+	public String getOriginalCaseNumber() {
+		return originalCaseNumber;
+	}
 	
     
-	public Case(Document page){
-		crossRefNumber = page.select(".ssCaseDetailCaseNbr").text();
-		
-	    Elements tables = page.select("body > table");
+	public Case(Document page, String originalCaseNumber) {
+		this.originalCaseNumber = originalCaseNumber;
+		if(!page.text().equals("Sorry, case not found!")) {
+			caseFound = 1;
+			crossRefNumber = page.select(".ssCaseDetailCaseNbr").text();
+			
+		    Elements tables = page.select("body > table");
+	
+	       String tableType = ""; 
+	       for(Element t : tables){
+	    	   tableType = t.select("caption").text();
+	    	   //  .println(tableType);
+	    	   if(tableType.equals("Related Case Information")){
+	    		   rct = new RelatedCaseTable(t);
+	   // 		   System.out.println("Related Case table created.\n");
+	    	   } else if (tableType.equals("Party Information")){
+	    		   pit = new PartyInformationTable(t);
+	  //  		   System.out.println("Party Info table created.\n");
+	    	   } else if (tableType.equals("Charge Information")){
+	    	       chargeTable = new ChargeInformationTable(t);
+	   // 	       System.out.println("Charge table created.\n");
+	   // 	       System.out.println(chargeTable.getCharges());
+	   // 	       System.out.println(chargeTable.getStatutes());
+	    	   } else if (tableType.equals("Events & Orders of the Court")){
+	    	       eventTable = new EventsTable(t);
+	   // 	       System.out.println("Events table created.\n");
+	    	   } else if (tableType.equals("Financial Information")){
+	//		       FinancialInformationTable financialTable = new FinancialInformationTable(t);
+	  //  		   System.out.println("Financial Information table created.\n");
+	    	   } else {
+	  //  		   System.out.println("Table does not match identified type; no table constructed in data");
+	    	   }
+	       }
+	       
+		} else { 
+			caseFound = 0;
+			System.out.println("No case here!");
+		}
 
-       String tableType = ""; 
-       for(Element t : tables){
-    	   tableType = t.select("caption").text();
-    	   //  .println(tableType);
-    	   if(tableType.equals("Related Case Information")){
-    		   rct = new RelatedCaseTable(t);
-   // 		   System.out.println("Related Case table created.\n");
-    	   } else if (tableType.equals("Party Information")){
-    		   pit = new PartyInformationTable(t);
-  //  		   System.out.println("Party Info table created.\n");
-    	   } else if (tableType.equals("Charge Information")){
-    	       chargeTable = new ChargeInformationTable(t);
-   // 	       System.out.println("Charge table created.\n");
-   // 	       System.out.println(chargeTable.getCharges());
-   // 	       System.out.println(chargeTable.getStatutes());
-    	   } else if (tableType.equals("Events & Orders of the Court")){
-    	       eventTable = new EventsTable(t);
-   // 	       System.out.println("Events table created.\n");
-    	   } else if (tableType.equals("Financial Information")){
-//		       FinancialInformationTable financialTable = new FinancialInformationTable(t);
-  //  		   System.out.println("Financial Information table created.\n");
-    	   } else {
-  //  		   System.out.println("Table does not match identified type; no table constructed in data");
-    	   }
-       }
-       
        
 
 	    

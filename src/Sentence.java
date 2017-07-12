@@ -171,7 +171,7 @@ public class Sentence {
 		}
 		splitSentence = sentence.split("\\W+");
 		for (int i = 0; i < splitSentence.length; i++) {
-			System.out.println(i + ". " + splitSentence[i]);
+//			System.out.println(i + ". " + splitSentence[i]);
 			if (splitSentence[i].compareTo("Minimum") == 0) {
 				if (StringUtils.isNumeric(splitSentence[i+1])) {
 					min = Integer.parseInt(splitSentence[i+1]);
