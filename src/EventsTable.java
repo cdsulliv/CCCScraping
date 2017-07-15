@@ -12,6 +12,7 @@ public class EventsTable {
 	TreeMap<String, String> dispositions 	= new TreeMap<String, String>();
 	TreeMap<String, Sentence> sentences	 	= new TreeMap<String, Sentence>();
 	ArrayList<String> events 				= new ArrayList<String>(Arrays.asList(""));
+	String judOfficer = "";
 	
 	public TreeMap<String, String> getDispositions(){
 		return dispositions;
@@ -41,13 +42,17 @@ public class EventsTable {
 	}
 	
 	// Get the string of hearings information
-	public String getEventsString(){
+	public String getEventsString() {
 		String listString = ""; 
 		for (String s : events)
 		{
 		    listString += s + "; ";
 		}
 		return listString.replaceAll("[,]", ";"); 		
+	}
+	
+	public String getJudOfficer() {
+		return judOfficer;
 	}
 	
 	
@@ -91,10 +96,11 @@ public class EventsTable {
 		Element eventInfoHTML					= null;	
 		String charge 	= ""; 
 		String dispo 	= "";
-		
+
 		// Loop through the rows of the table and create a new event for each line
 		Elements rows = aTable.select("tr");
 		for(Element row : rows){
+
 			eventInfo 		= new TreeMap<String, String>();
 			eventDetails	= new TreeMap<String, String>();
 //			eventInfoHTML	= new Element;
@@ -111,7 +117,24 @@ public class EventsTable {
 				// Get event entry type and parse accordingly
 				String eventType = getEventType(eventInfoHTML);
 				
-				if(eventType.equals("dispo")){
+				if(eventType.equals("dispo")) {
+					Elements judOffDivs = eventInfoHTML.select("div");
+//					System.out.println("TEST: " + judOffDivs);
+					String tempJudOff = judOffDivs.first().ownText();
+					// removing all unnecessary characters
+					tempJudOff = tempJudOff.replace("Judicial Officer: ", "");
+					tempJudOff = tempJudOff.replace("(", "");
+					tempJudOff = tempJudOff.replace(")", "");
+					
+					// Reversing order of first and last name (because comma needs to be removed and order would be confusing after that)
+					int commaIndex = tempJudOff.indexOf(",");
+					String tempLastName = tempJudOff.substring(0, commaIndex + 2);
+					tempJudOff = tempJudOff.replace(tempLastName, "");
+					tempLastName = tempLastName.replace(", ", "");
+					tempJudOff = tempJudOff + " " + tempLastName;
+					if (judOfficer.compareTo("") == 0) {
+						judOfficer = tempJudOff;
+					}
 					
 					// Select the divs with the disposition information
 					Elements dispoDivs = eventInfoHTML.select("div > div > div");

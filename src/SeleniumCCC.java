@@ -78,7 +78,8 @@ public class SeleniumCCC {
       System.out.println("Number of tables: " + tables.size());
       if (tables.size() == 0) {
     	  System.out.println(source);
-      }
+    	  return 1;
+      } else{
       Element requiredTable = tables.last();
       Elements rows = requiredTable.select("td");
 	  for(Element td : rows) {
@@ -88,7 +89,7 @@ public class SeleniumCCC {
 	  }
 	  return 0;
   }
-  
+  }  
 
   // WRITING LINE BY LINE TO A TEXT FILE
 //  String filename = caseNumber + ".txt";   

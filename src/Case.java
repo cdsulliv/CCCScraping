@@ -134,6 +134,10 @@ public class Case {
 		
 		return maxUnit;	
 	}
+	
+	public String getJudOfficerFinal() {
+		return eventTable.getJudOfficer();
+	}
     
     // Get information directly from Party Information Table
 	public String getDefendantName(){

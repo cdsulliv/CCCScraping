@@ -12,186 +12,193 @@ public class CaseLooper {
 	private static final String NEW_LINE_SEPARATOR = "\n";
     private static final String FILE_HEADER = "original_caseid,scraped_caseid,casefound,defendantname,defenseattorney,prosecutor,relatedcases,"
     		+ "numcharges,charges,levels,disposition,incarcerated,suspended,suspendedtext,sentence,"
-    		+ "minimum,maximum,sentencedtotext,minNo, minUnit, maxNo, maxUnit";
-	private static String[] caseNumbers;
-	private static String[] refinedCaseNumbers;
+    		+ "minimum,maximum,sentencedtotext,minNo, minUnit, maxNo, maxUnit, judOfficer";
+	private static TreeMap<Integer, String> refinedCaseNumbers;
 	private static SeleniumCCC seleniumInstance;
 
 	public static void main(String[] args) throws Exception {
-		// caseNumbers - array of Strings to store first 100 case numbers 
-		caseNumbers = new String[100];
-		refinedCaseNumbers = new String[100];
+		refinedCaseNumbers = new TreeMap<Integer, String>();
 		CaseInput testInput = new CaseInput();
 		testInput.open();
 		testInput.read();
-		testInput.initializeArray(caseNumbers);
 		testInput.close();
 		
 		// code to refine all the case numbers that have been read in to caseNumbers
 		CaseNumberRefiner refiner = new CaseNumberRefiner();
-		for (int i = 0; i < caseNumbers.length; i++) {
-//			System.out.println("Old: " + caseNumbers[i]);
-			refinedCaseNumbers[i] = refiner.Refiner(caseNumbers[i]);
-//			System.out.println("New: " + caseNumbers[i]);
+		for (int i = 0; i < testInput.caseNumbers.size(); i++) {
+			refinedCaseNumbers.put(i, refiner.Refiner(testInput.caseNumbers.get(i)));
 		}
 		
 	    // TreeMap will hold the filename and a Case object
 		TreeMap<String,Case> Cases = new TreeMap<String,Case>();
 
+		// stores current directory 
 		final String dir = System.getProperty("user.dir");
 	    System.out.println("current dir = " + dir);
-	    
-	    
+	    String fileName = "CasesMisDisJudge3.csv"; 
+	    FileWriter fileWriter = null;
+    	fileWriter = new FileWriter(fileName);
+        
+        //Write the CSV file header
+    	fileWriter.append(FILE_HEADER.toString());
+
+    	//Add a new line separator after the header and flush so that it writes to the csv file
+    	fileWriter.append(NEW_LINE_SEPARATOR);
+    	fileWriter.flush();
+	   
+    	// sets up Selenium 
 		seleniumInstance = new SeleniumCCC();
 		seleniumInstance.setUp();
+		
 		String page = "";
-	    for(int i = 0; i < refinedCaseNumbers.length - 94; i++) {
+		Case currcase;
+		
+		// loop to search each case and write to csv file on the go 
+	    for(int i = 0; i < refinedCaseNumbers.size(); i++) {
 	    	// 1) Get searchable string - DONE
-	    	String currentCaseNumber = refinedCaseNumbers[i];
+	    	String currentCaseNumber = refinedCaseNumbers.get(i);
 	    	
-	    	// 2) Launch Selenium browser and navigate to page - DONE
+	    	// 2) Launch Selenium browser, navigate to page and get page source - DONE
 	    	if (i == 0) {
 				page = seleniumInstance.testFirstClark(currentCaseNumber, 0);
 	    	}
 	    	else {
 	    		page = seleniumInstance.testFirstClark(currentCaseNumber, 1);
 	    	}
-	    	
-	    	// 3) Get page source
-//	    	String page = driver.getSource();
-	    	
-	    	// 4) Create new case
+
+	    	// 3) Create new case and add it to treemap of cases - DONE
 //	    	Cases.put(s, new Case(Jsoup.parse(new File(s), "utf-8")));
-	    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), caseNumbers[i]));
-	    	if(Cases.get(currentCaseNumber).getCharges() == null) {
-	    		System.out.println("CHARGES WERE INITIALLY NULL; RERUNNING");
-	    		page = seleniumInstance.testFirstClark(currentCaseNumber, 1);
-		    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), caseNumbers[i]));
-	    		
-	    	}
+	    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), testInput.caseNumbers.get(i)));
 	    	
-	    	// 5) Close driver
-	    }	    
-	    System.out.println("Number of Cases created: " + Cases.size());
-	    
+	    	// re-do a case if it was searchable but variables were not assigned properly 
+	    	if (Cases.get(currentCaseNumber).getDefendantName().compareTo("NULL") == 0) {
+	    		System.out.println("CASE WAS INITIALLY NULL; RERUNNING");
+	    		page = seleniumInstance.testFirstClark(currentCaseNumber, 1);
+		    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), testInput.caseNumbers.get(i)));
+	    		
+	    	}
 	       
-	    String fileName = "CaseOutput.csv"; 
-	    FileWriter fileWriter = null;
-	    try {
-	    	fileWriter = new FileWriter(fileName);
-	        
-	        //Write the CSV file header
-	    	fileWriter.append(FILE_HEADER.toString());
-
-	    	//Add a new line separator after the header
-	    	fileWriter.append(NEW_LINE_SEPARATOR);
-
-	    	//Loop over Cases - create new object and write to the CSV file
-	    	for(String k: Cases.keySet()){
-	    		System.out.println(k);
-	    		
-	    		// Original case id
-	    		fileWriter.append(Cases.get(k).getOriginalCaseNumber()); 
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Scraped case id
-	    		fileWriter.append(Cases.get(k).getCrossRefNumber()); 
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Case Found
-	    		fileWriter.append(Cases.get(k).getCaseFound() + ""); 
-	    		fileWriter.append(COMMA_DELIMITER);
-
-	    		// Defendant Name
-	    		fileWriter.append(Cases.get(k).getDefendantName());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Defense Attorney
-	    		fileWriter.append(Cases.get(k).getDefenseAttorney());
-	    		fileWriter.append(COMMA_DELIMITER);
-
-	    		// Prosecutor
-	    		fileWriter.append(Cases.get(k).getProsecutingAttorney());
-	    		fileWriter.append(COMMA_DELIMITER);
-
-	    		// Related Cases
-	    		fileWriter.append(Cases.get(k).getRelatedCaseTable().getRelatedCasesString());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Number of charges
-	    		fileWriter.append(Cases.get(k).getCharges().size() + "");
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// List of charges
-	    		fileWriter.append(Cases.get(k).getChargesString());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// List of charge level
-	    		fileWriter.append(Cases.get(k).getChargeLevelsString());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Dispositions
-	    		fileWriter.append(Cases.get(k).getDispositionsString());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Sentences - incarcerated
-	    		fileWriter.append(Cases.get(k).isIncarcerated() + "");
-	    		fileWriter.append(COMMA_DELIMITER);
-
-	    		// Sentences - suspended
-	    		fileWriter.append(Cases.get(k).isSuspended() + "");
-	    		fileWriter.append(COMMA_DELIMITER);
-
-	    		// Sentences - suspended
-	    		fileWriter.append(Cases.get(k).getSuspendedText()+"");
-	    		fileWriter.append(COMMA_DELIMITER);	    		
-	    		// Sentences text
-	    		fileWriter.append(Cases.get(k).getSentencesString());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Sentences Min
-	    		fileWriter.append(Cases.get(k).getMaxSentenceText());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Sentences Max
-	    		fileWriter.append(Cases.get(k).getMinSentenceText());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		// Sentenced-to Text
-	    		fileWriter.append(Cases.get(k).getSentencedToText());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Min sentence number
-	    		fileWriter.append(Cases.get(k).getSentenceMin()+"");
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Min sentence units
-	    		fileWriter.append(Cases.get(k).getSentenceMax()+"");
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Max sentence number
-	    		fileWriter.append(Cases.get(k).getSentenceMinUnit());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		// Max sentence units 
-	    		fileWriter.append(Cases.get(k).getSentenceMaxUnit());
-	    		fileWriter.append(COMMA_DELIMITER);
-	    		
-	    		fileWriter.append(NEW_LINE_SEPARATOR);
-	    	}
-	    	System.out.println("CSV file was created successfully !!!");
-	    } catch (Exception e) {
-
-	    	System.out.println("Error in CsvFileWriter !!!");
-	    	e.printStackTrace();
-	    } finally {
-	    	try {
-	    		fileWriter.flush();
-	    		fileWriter.close();
-	    	} catch (IOException e) {
-	    		System.out.println("Error while flushing/closing fileWriter !!!");
-	    		e.printStackTrace();
-	    	}
-	    }   
+//	    try {
 	
-	}
+	    	// Loop over Cases - create new object and write to the CSV file
+//	    	for(String k: Cases.keySet()){
+	    	
+	    	currcase = Cases.get(refinedCaseNumbers.get(i));
+	    	System.out.println(currcase.getCrossRefNumber());   	
+	    	
+	    	// Original case id
+	    	fileWriter.append(currcase.getOriginalCaseNumber()); 
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Scraped case id
+	    	fileWriter.append(currcase.getCrossRefNumber()); 
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Case Found
+	    	fileWriter.append(currcase.getCaseFound() + ""); 
+	    	fileWriter.append(COMMA_DELIMITER);
+
+	    	// Defendant Name
+	    	fileWriter.append(currcase.getDefendantName());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Defense Attorney
+	    	fileWriter.append(currcase.getDefenseAttorney());
+	    	fileWriter.append(COMMA_DELIMITER);
+
+	    	// Prosecutor
+	    	fileWriter.append(currcase.getProsecutingAttorney());
+	    	fileWriter.append(COMMA_DELIMITER);
+
+	    	// Related Cases
+	    	fileWriter.append(currcase.getRelatedCaseTable().getRelatedCasesString());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Number of charges
+	    	fileWriter.append(currcase.getCharges().size() + "");
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// List of charges
+	    	fileWriter.append(currcase.getChargesString());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// List of charge level
+	    	fileWriter.append(currcase.getChargeLevelsString());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Dispositions
+	    	fileWriter.append(currcase.getDispositionsString());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Sentences - incarcerated
+	    	fileWriter.append(currcase.isIncarcerated() + "");
+	    	fileWriter.append(COMMA_DELIMITER);
+
+	    	// Sentences - isSuspended
+	    	fileWriter.append(currcase.isSuspended() + "");
+	    	fileWriter.append(COMMA_DELIMITER);
+
+	    	// Sentences - suspended
+	    	fileWriter.append(currcase.getSuspendedText()+"");
+	    	fileWriter.append(COMMA_DELIMITER);	    		
+	    		
+	    	// Sentences text
+	    	fileWriter.append(currcase.getSentencesString());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Sentences Min
+	    	fileWriter.append(currcase.getMaxSentenceText());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Sentences Max
+	    	fileWriter.append(currcase.getMinSentenceText());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Sentenced-to Text
+	    	fileWriter.append(currcase.getSentencedToText());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Min sentence number
+	    	fileWriter.append(currcase.getSentenceMin()+"");
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Min sentence units
+	    	fileWriter.append(currcase.getSentenceMax()+"");
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Max sentence number
+	    	fileWriter.append(currcase.getSentenceMinUnit());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Max sentence units 
+	    	fileWriter.append(currcase.getSentenceMaxUnit());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	// Judicial Officer name
+	    	fileWriter.append(currcase.getJudOfficerFinal());
+	    	fileWriter.append(COMMA_DELIMITER);
+	    		
+	    	fileWriter.append(NEW_LINE_SEPARATOR);
+	    	fileWriter.flush();
+	    	}
+	    
+	        fileWriter.close();
+	    	System.out.println("CSV file was created successfully !!!");
+	    } 
 }
+
+//	catch (Exception e) {
+//
+//	    	System.out.println("Error in CsvFileWriter !!!");
+//	    	e.printStackTrace();
+//	    } finally {
+//	    	try {
+//	    		fileWriter.flush();
+//	    		fileWriter.close();
+//	    	} catch (IOException e) {
+//	    		System.out.println("Error while flushing/closing fileWriter !!!");
+//	    		e.printStackTrace();
+//	    	}
+//	    }   
+	
+//	}
