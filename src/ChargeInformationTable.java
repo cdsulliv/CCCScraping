@@ -11,20 +11,20 @@ public class ChargeInformationTable {
 	ArrayList<String> dates		= new ArrayList<String>();
 
 	
-	public ArrayList<String> getCharges(){
+	public ArrayList<String> getCharges() {
 		return charges;
 	}
-	public ArrayList<String> getStatutes(){
+	public ArrayList<String> getStatutes() {
 		return statutes;
 	}
-	public ArrayList<String> getLevels(){
+	public ArrayList<String> getLevels() {
 		return levels;
 	}
-	public ArrayList<String> getDates(){
+	public ArrayList<String> getDates() {
 		return dates;
 	}
 	
-	public String getChargesString(){
+	public String getChargesString() {
 		String listString = ""; 
 		for (String s : charges)
 		{
@@ -32,7 +32,7 @@ public class ChargeInformationTable {
 		}
 		return listString.replaceAll("[,]", "-"); 	
 	}
-	public String getStatutesString(){
+	public String getStatutesString() {
 		String listString = ""; 
 		for (String s : statutes)
 		{
@@ -40,7 +40,7 @@ public class ChargeInformationTable {
 		}
 		return listString; 	
 	}
-	public String getLevelsString(){
+	public String getLevelsString() {
 		String listString = ""; 
 		for (String s : levels)
 		{
@@ -48,7 +48,7 @@ public class ChargeInformationTable {
 		}
 		return listString.replaceAll("[,]", "-"); 	
 	}
-	public String getDatesString(){
+	public String getDatesString() {
 		String listString = ""; 
 		for (String s : dates)
 		{
@@ -58,14 +58,14 @@ public class ChargeInformationTable {
 
 	}
 	
-	public ChargeInformationTable(){
+	public ChargeInformationTable() {
 		ArrayList<String> charges 	= new ArrayList<String>(Arrays.asList("NULL"));
 		ArrayList<String> statutes 	= new ArrayList<String>(Arrays.asList("NULL")); 
 		ArrayList<String> levels 	= new ArrayList<String>(Arrays.asList("NULL"));
 		ArrayList<String> dates		= new ArrayList<String>(Arrays.asList("NULL"));
 	}
 	
-	public ChargeInformationTable(Element aTable){
+	public ChargeInformationTable(Element aTable) {
 		// Check that the table is the right one
 		String caption= aTable.select("caption").text();
 		assert caption == "Charge Information";
@@ -78,13 +78,13 @@ public class ChargeInformationTable {
 
 		// Loop through the rows of the table and create a new charge for each line
 		Elements rows = aTable.select("tr");
-		for(Element row : rows){
+		for(Element row : rows) {
 			chargeInfo = new TreeMap<String, String>();
 			
 			Elements cells = row.select("td");
 
-			for (String col : headers){
-				if(cells.size()==headers.size()){
+			for (String col : headers) {
+				if(cells.size() == headers.size()) {
 					chargeInfo.put(col, cells.get(headers.indexOf(col)).text());
 				}
 			}

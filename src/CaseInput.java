@@ -1,19 +1,18 @@
-
 import java.io.*;
 import java.util.*;
 
 public class CaseInput {
 	private Scanner s;
-	//private String[] caseNumbers;
 	TreeMap<Integer, String> caseNumbers;
 	
 	public CaseInput() {
-		//caseNumbers = new String[100];
 		caseNumbers = new TreeMap<Integer, String>();
 	}
-
+	
+	// method to open file that is to be read and throw exception if unsuccessful 
 	public void open() {
 		try {
+			// Name of input file: Change here for updated samples. Needs a file of courtnums without column header
 			s = new Scanner(new File("MisDisJudgeName.txt"));
 		}	
 		catch (Exception E) {
@@ -21,24 +20,17 @@ public class CaseInput {
 		}
 	}
 	
+	// method to read in contents of file into treemap of casenumbers  
 	public void read() {
 		int count = 0;
 		while(s.hasNext()) {
 			String testString = s.next();
-			//caseNumbers[count] = testString;
 			caseNumbers.put(count, testString);
-//			System.out.println(count + ". " + caseNumbers[count]);
 			count++;
 		}
 	}
-	
-//	public void initializeArray(String[] caseNumbers) {
-//		for (int i = 0; i < 100; i++) {
-//			caseNumbers[i] = this.caseNumbers[i];
-//			System.out.println(caseNumbers[i]);
-//		}
-//	}
-	
+
+	// method to close input file
 	public void close() {
 		s.close();
 	}

@@ -30,6 +30,8 @@ public class SeleniumCCC {
 //  @Before
   public void setUp() throws Exception {
 	System.out.println("HelloSetUp");
+	
+	// Colin gecko location - "Libraries/geckodriver.exe", Shantanu - "/Users/shantanupuri26/Downloads/geckodriver" 
 	System.setProperty("webdriver.gecko.driver", "/Users/shantanupuri26/Downloads/geckodriver");
 	DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 	capabilities.setCapability("marionette", true);
@@ -46,29 +48,36 @@ public class SeleniumCCC {
         driver.findElement(By.linkText("District Civil/Criminal Records")).click();
     }
  
-    driver.findElement(By.id("CrossRefNumberOption")).click();
-    driver.findElement(By.id("CaseSearchValue")).clear();
-    driver.findElement(By.id("CaseSearchValue")).sendKeys(caseNumber);
-    driver.findElement(By.id("SearchSubmit")).click();
-    System.out.println(caseNumber);
-    Thread.sleep(2000);
-    String sourceIntermediate = driver.getPageSource();
-    int caseNotFound = parseIntermediatePage(sourceIntermediate);
-    if (caseNotFound == 1) {
-        driver.findElement(By.cssSelector("a[href*='Search.aspx?ID=400']")).click();
-    	return("Sorry, case not found!");
+    if (driver.findElements(By.id("CrossRefNumberOption")).size() == 0) {
+    	System.out.print("Couldn't find CrossRefNumberOption; relaunching browser.");
+    	setUp();
+    	testFirstClark(caseNumber, 0);
     }
-    else {
-    	driver.findElement(By.cssSelector("a[href*='CaseDetail']")).click();
-    	String source = driver.getPageSource();
-        Thread.sleep(1000);
-        driver.findElement(By.cssSelector("a[href*='Search.aspx?ID=400']")).click();
-        return source;
+    try {
+    	driver.findElement(By.id("CrossRefNumberOption")).click();
+    	driver.findElement(By.id("CaseSearchValue")).clear();
+    	driver.findElement(By.id("CaseSearchValue")).sendKeys(caseNumber);
+    	driver.findElement(By.id("SearchSubmit")).click();
+    	System.out.println(caseNumber);
+    	Thread.sleep(2000);
+    	String sourceIntermediate = driver.getPageSource();
+    	int caseNotFound = parseIntermediatePage(sourceIntermediate);
+    	
+    	if (caseNotFound == 1) {
+    		driver.findElement(By.cssSelector("a[href*='Search.aspx?ID=400']")).click();
+    		return("Sorry, case not found!");
+    	} else {
+    		driver.findElement(By.cssSelector("a[href*='CaseDetail']")).click();
+    		String source = driver.getPageSource();
+    		Thread.sleep(1000);
+    		driver.findElement(By.cssSelector("a[href*='Search.aspx?ID=400']")).click();
+    		return source;
+    	}	
+
+    } catch (Throwable e) {
+  	  	System.out.println("Something really went wrong; can't click the Cross Ref Number button.");
+  	  	return("No case found.");    	
     }
-//    String currentUrl = driver.getCurrentUrl();
-//    System.out.println(source);
-//    driver.navigate().back();
-//    driver.navigate().back();
   }
 
   
@@ -79,29 +88,19 @@ public class SeleniumCCC {
       if (tables.size() == 0) {
     	  System.out.println(source);
     	  return 1;
-      } else{
-      Element requiredTable = tables.last();
-      Elements rows = requiredTable.select("td");
-	  for(Element td : rows) {
-		  if (td.text().compareTo("No cases matched your search criteria.") == 0) {
+      } else {
+    	  Element requiredTable = tables.last();
+    	  Elements rows = requiredTable.select("td");
+    	  for(Element td : rows) {
+    		  if (td.text().compareTo("No cases matched your search criteria.") == 0) {
 			  return 1;
-		  }
-	  }
+    		  }
+    	  }
+    	  
 	  return 0;
-  }
+      }
   }  
 
-  // WRITING LINE BY LINE TO A TEXT FILE
-//  String filename = caseNumber + ".txt";   
-//  try {
-//      PrintWriter outStream = new PrintWriter(filename);
-//      outStream.println(source);
-//      outStream.close();	
-//  }
-//  catch (FileNotFoundException e) {
-//  	e.printStackTrace();
-//  }
- 
   
 //  @After
   public void tearDown() throws Exception {

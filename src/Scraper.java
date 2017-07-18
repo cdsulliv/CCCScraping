@@ -11,8 +11,7 @@ public class Scraper {
 	public static void main(String[] args) throws Exception {
        final String dir = System.getProperty("user.dir");
        System.out.println("current dir = " + dir);
-	   
-	   
+
        Document document = Jsoup.parse(new File("testpage.html"), "utf-8"); 
        
        Elements tbodies = document.select("tbody");
@@ -27,24 +26,23 @@ public class Scraper {
        String tableType = ""; 
        // integer count keeps track of table number 
        int count = 1;
-       for(Element t : tables){
+       for(Element t : tables) {
     	   tableType = t.select("caption").text();
-//    	   System.out.println(tableType);
-    	   if(tableType.equals("Related Case Information")){
+    	   if(tableType.equals("Related Case Information")) {
     		   System.out.println("table " + count + ": Related Case table created.");
     		   RelatedCaseTable rct = new RelatedCaseTable(t);
-    	   } else if (tableType.equals("Party Information")){
+    	   } else if (tableType.equals("Party Information")) {
     		   System.out.println("table " + count + ": Party Info table created.");
     		   PartyInformationTable pit = new PartyInformationTable(t);
-    	   } else if (tableType.equals("Charge Information")){
+    	   } else if (tableType.equals("Charge Information")) {
     	       System.out.println("table " + count + ": Charge table created.");
     		   ChargeInformationTable chargeTable = new ChargeInformationTable(t);
     	       System.out.println(chargeTable.getCharges());
     	       System.out.println(chargeTable.getStatutes());
-    	   } else if (tableType.equals("Events & Orders of the Court")){
+    	   } else if (tableType.equals("Events & Orders of the Court")) {
     	       System.out.println("table " + count + ": Events table created.");
     		   EventsTable eventTable = new EventsTable(t);
-    	   } else if (tableType.equals("Financial Information")){
+    	   } else if (tableType.equals("Financial Information")) {
     		   System.out.println("table " + count + ": Financial Information table created.");
 //    	       FinancialInformationTable financialTable = new FinancialInformationTable(t);
     	   } else {
@@ -52,9 +50,6 @@ public class Scraper {
     	   }
     	   count++;
        }
-       
-       
-       
-       
+
     }
 }

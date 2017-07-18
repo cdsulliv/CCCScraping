@@ -3,7 +3,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 import java.util.TreeMap;
 
 public class CaseLooper {
@@ -35,7 +34,7 @@ public class CaseLooper {
 		// stores current directory 
 		final String dir = System.getProperty("user.dir");
 	    System.out.println("current dir = " + dir);
-	    String fileName = "CasesMisDisJudge3.csv"; 
+	    String fileName = "CaseOutput2.csv"; 
 	    FileWriter fileWriter = null;
     	fileWriter = new FileWriter(fileName);
         
@@ -48,7 +47,6 @@ public class CaseLooper {
 	   
     	// sets up Selenium 
 		seleniumInstance = new SeleniumCCC();
-		seleniumInstance.setUp();
 		
 		String page = "";
 		Case currcase;
@@ -59,7 +57,8 @@ public class CaseLooper {
 	    	String currentCaseNumber = refinedCaseNumbers.get(i);
 	    	
 	    	// 2) Launch Selenium browser, navigate to page and get page source - DONE
-	    	if (i == 0) {
+	    	if (i % 300 == 0) {
+	    		seleniumInstance.setUp();
 				page = seleniumInstance.testFirstClark(currentCaseNumber, 0);
 	    	}
 	    	else {
@@ -67,22 +66,18 @@ public class CaseLooper {
 	    	}
 
 	    	// 3) Create new case and add it to treemap of cases - DONE
-//	    	Cases.put(s, new Case(Jsoup.parse(new File(s), "utf-8")));
 	    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), testInput.caseNumbers.get(i)));
 	    	
 	    	// re-do a case if it was searchable but variables were not assigned properly 
-	    	if (Cases.get(currentCaseNumber).getDefendantName().compareTo("NULL") == 0) {
+	    	if (Cases.get(currentCaseNumber).getDefendantName().equals("NULL") & Cases.get(currentCaseNumber).getCaseFound() == 1) {
 	    		System.out.println("CASE WAS INITIALLY NULL; RERUNNING");
 	    		page = seleniumInstance.testFirstClark(currentCaseNumber, 1);
 		    	Cases.put(currentCaseNumber, new Case(Jsoup.parse(page), testInput.caseNumbers.get(i)));
-	    		
 	    	}
-	       
-//	    try {
+
 	
-	    	// Loop over Cases - create new object and write to the CSV file
-//	    	for(String k: Cases.keySet()){
-	    	
+	    	// Create new object and write to the CSV file
+
 	    	currcase = Cases.get(refinedCaseNumbers.get(i));
 	    	System.out.println(currcase.getCrossRefNumber());   	
 	    	
@@ -186,19 +181,3 @@ public class CaseLooper {
 	    	System.out.println("CSV file was created successfully !!!");
 	    } 
 }
-
-//	catch (Exception e) {
-//
-//	    	System.out.println("Error in CsvFileWriter !!!");
-//	    	e.printStackTrace();
-//	    } finally {
-//	    	try {
-//	    		fileWriter.flush();
-//	    		fileWriter.close();
-//	    	} catch (IOException e) {
-//	    		System.out.println("Error while flushing/closing fileWriter !!!");
-//	    		e.printStackTrace();
-//	    	}
-//	    }   
-	
-//	}

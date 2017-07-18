@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
@@ -14,83 +13,92 @@ public class Case {
     EventsTable eventTable 				= new EventsTable(); 
     int caseFound; 
     
-    public String getCrossRefNumber(){
+    public String getCrossRefNumber() {
     	return crossRefNumber; 
     }
     
-    public RelatedCaseTable getRelatedCaseTable(){
+    public RelatedCaseTable getRelatedCaseTable() {
     	return rct; 
     }
-    public PartyInformationTable getPartyInformationTable(){
+    
+    public PartyInformationTable getPartyInformationTable() {
     	return pit;
     }
-    public ChargeInformationTable getChargeInformationTable(){
+    
+    public ChargeInformationTable getChargeInformationTable() {
     	return chargeTable; 
     }
-    public EventsTable getEventsTable(){
+    
+    public EventsTable getEventsTable() {
     	return eventTable;
     }
     
     
     // Get information directly from Events Information Table
-	public String getDispositionsString(){
+	public String getDispositionsString() {
 		return getEventsTable().getDispositionsString(); 
 	}
-	public String getSentencesString(){
+	
+	public String getSentencesString() {
 		return getEventsTable().getSentencesString();
 	}
-	public String getEventsString(){
+	
+	public String getEventsString() {
 		return getEventsTable().getEventsString();
 	}
-	public TreeMap<String, Sentence> getSentences(){
+	
+	public TreeMap<String, Sentence> getSentences() {
 		return getEventsTable().getSentences();
 	}
-	public int isIncarcerated(){
+	
+	public int isIncarcerated() {
 		int inc = 0; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			inc = getEventsTable().getSentences().get(k).isIncarcerated();
 		}
 		
 		return inc;
 	}
-	public int isSuspended(){
+	
+	public int isSuspended() {
 		int susp = 0; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			susp = getEventsTable().getSentences().get(k).isSuspended();
 		}
 		
 		return susp;
 	}
 	
-	public String getSuspendedText(){
+	public String getSuspendedText() {
 		String susp = ""; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			susp = susp + getEventsTable().getSentences().get(k).getSuspendedText();
 		}
 		
 		return susp;
 	}
 	
-	public String getMaxSentenceText(){
+	public String getMaxSentenceText() {
 		String s = ""; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			s = getEventsTable().getSentences().get(k).getMaxSentenceText(); 
 		}
 		
 		return s;
 	}
 	
-	public String getMinSentenceText(){
+	public String getMinSentenceText() {
 		String s = ""; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			s = getEventsTable().getSentences().get(k).getMinSentenceText(); 
 		}
 		
 		return s;
 	}
-	public String getSentencedToText(){
+	
+	public String getSentencedToText() {
 		String s = ""; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			s = s + getEventsTable().getSentences().get(k).getSentencedToText(); 
 		}
 		
@@ -98,9 +106,9 @@ public class Case {
 		
 	}
 	
-	public int getSentenceMin(){
+	public int getSentenceMin() {
 		int min = -1; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			System.out.println("Getting case-level min: " + getEventsTable().getSentences().get(k).getMin());
 			min = getEventsTable().getSentences().get(k).getMin(); 
 		}
@@ -108,27 +116,27 @@ public class Case {
 		return min;	
 	}
 	
-	public int getSentenceMax(){
+	public int getSentenceMax() {
 		int max = -1; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			max = getEventsTable().getSentences().get(k).getMax(); 
 		}
 		
 		return max;	
 	}
 	
-	public String getSentenceMinUnit(){
+	public String getSentenceMinUnit() {
 		String minUnit = ""; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			minUnit = minUnit + getEventsTable().getSentences().get(k).getMinUnit(); 
 		}
 		
 		return minUnit;	
 	}
 	
-	public String getSentenceMaxUnit(){
+	public String getSentenceMaxUnit() {
 		String maxUnit = ""; 
-		for(String k : getEventsTable().getSentences().keySet()){
+		for(String k : getEventsTable().getSentences().keySet()) {
 			maxUnit = maxUnit + getEventsTable().getSentences().get(k).getMaxUnit(); 
 		}
 		
@@ -139,43 +147,55 @@ public class Case {
 		return eventTable.getJudOfficer();
 	}
     
+	
     // Get information directly from Party Information Table
-	public String getDefendantName(){
+	public String getDefendantName() {
 		return getPartyInformationTable().getDefendantName();
 	}
-	public String getPlaintiffName(){
+	
+	public String getPlaintiffName() {
 		return getPartyInformationTable().getPlaintiffName();
 	}
-	public String getDefenseAttorney(){
+	
+	public String getDefenseAttorney() {
 		return getPartyInformationTable().getDefenseAttorney(); 
 	}
-	public String getProsecutingAttorney(){
+	
+	public String getProsecutingAttorney() {
 		return getPartyInformationTable().getProsecutingAttorney();
 	}
 	
+	
 	// Get information directly from Charge Information Table
-	public ArrayList<String> getCharges(){
+	public ArrayList<String> getCharges() {
 		return getChargeInformationTable().getCharges();
 	}
-	public ArrayList<String> getStatutes(){
+	
+	public ArrayList<String> getStatutes() {
 		return getChargeInformationTable().getStatutes();
 	}
-	public ArrayList<String> getChargeLevels(){
+	
+	public ArrayList<String> getChargeLevels() {
 		return getChargeInformationTable().getLevels();
 	}
-	public ArrayList<String> getDates(){
+	
+	public ArrayList<String> getDates() {
 		return getChargeInformationTable().getDates();
 	}
-	public String getChargesString(){
+	
+	public String getChargesString() {
 		return getChargeInformationTable().getChargesString();
 	}
-	public String getStatutesString(){
+	
+	public String getStatutesString() {
 		return getChargeInformationTable().getStatutesString();
 	}
-	public String getChargeLevelsString(){
+	
+	public String getChargeLevelsString() {
 		return getChargeInformationTable().getLevelsString();
 	}
-	public String getDatesString(){
+	
+	public String getDatesString() {
 		return getChargeInformationTable().getDatesString(); 
 	}
 	
@@ -188,47 +208,39 @@ public class Case {
 	}
 	
     
+	// constructor to decide type of table and create new instance accordingly
 	public Case(Document page, String originalCaseNumber) {
 		this.originalCaseNumber = originalCaseNumber;
 		if(!page.text().equals("Sorry, case not found!")) {
 			caseFound = 1;
 			crossRefNumber = page.select(".ssCaseDetailCaseNbr").text();
-			
 		    Elements tables = page.select("body > table");
-	
-	       String tableType = ""; 
-	       for(Element t : tables){
-	    	   tableType = t.select("caption").text();
-	    	   //  .println(tableType);
-	    	   if(tableType.equals("Related Case Information")){
-	    		   rct = new RelatedCaseTable(t);
-	   // 		   System.out.println("Related Case table created.\n");
-	    	   } else if (tableType.equals("Party Information")){
+		    String tableType = ""; 
+		    
+		    for(Element t : tables) {
+		    	tableType = t.select("caption").text();
+		    	if(tableType.equals("Related Case Information")) {
+		    		rct = new RelatedCaseTable(t);
+
+	    	   } else if (tableType.equals("Party Information")) {
 	    		   pit = new PartyInformationTable(t);
-	  //  		   System.out.println("Party Info table created.\n");
-	    	   } else if (tableType.equals("Charge Information")){
+
+	    	   } else if (tableType.equals("Charge Information")) {
 	    	       chargeTable = new ChargeInformationTable(t);
-	   // 	       System.out.println("Charge table created.\n");
-	   // 	       System.out.println(chargeTable.getCharges());
-	   // 	       System.out.println(chargeTable.getStatutes());
-	    	   } else if (tableType.equals("Events & Orders of the Court")){
+
+	    	   } else if (tableType.equals("Events & Orders of the Court")) {
 	    	       eventTable = new EventsTable(t);
-	   // 	       System.out.println("Events table created.\n");
-	    	   } else if (tableType.equals("Financial Information")){
-	//		       FinancialInformationTable financialTable = new FinancialInformationTable(t);
-	  //  		   System.out.println("Financial Information table created.\n");
+
+	    	   } else if (tableType.equals("Financial Information")) {
+	    		   // leaving financial information for now
 	    	   } else {
-	  //  		   System.out.println("Table does not match identified type; no table constructed in data");
+
 	    	   }
 	       }
 	       
 		} else { 
 			caseFound = 0;
 			System.out.println("No case here!");
-		}
-
-       
-
-	    
+		}   
 	}
 }

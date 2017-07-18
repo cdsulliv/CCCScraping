@@ -43,11 +43,11 @@ public class PartyInformationTable {
 
 				for (int i = 0; i < tr.childNodeSize(); i++) {
 					if (tr.child(i).text().equals("Defendant")) {
-						defendant = tr.child(i+1).text();
+						defendant = tr.child(i + 1).text();
 						defenseatt = tr.child(tr.childNodeSize() - 1).text();
 					}
 					else if (tr.child(i).text().equals("Plaintiff")) {
-						plaintiff = tr.child(i+1).text();
+						plaintiff = tr.child(i + 1).text();
 						prosecatt = tr.child(tr.childNodeSize() - 1).text();
 					}
 				}
